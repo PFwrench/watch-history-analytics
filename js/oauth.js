@@ -8,8 +8,8 @@ while (m = regex.exec(queryString)) {
     params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
 }
 
-var doneCallingSnippetAPI;
-var doneCallingStatisticsAPI
+var doneCallingSnippetAPI = false;
+var doneCallingStatisticsAPI = false;
 
 
 var watchHistoryId;
@@ -112,13 +112,15 @@ function getVideosSnippets(listOfIds) {
             }
         })
         .done(function(data) {
-            doneCallingSnippetAPI = true;
             if (count1 < listOfIds.length) {
                 videoSnippets.push(data.items[0]);
                 count1++;
                 getVideosSnippets(videoIds);
-            } else if (doneCallingStatisticsAPI) {
-                revealDash();
+            } else {
+                doneCallingStatisticsAPI = true;
+                if (doneCallingStatisticsAPI) {
+                    revealDash();
+                }
             }
         })
 }
@@ -133,18 +135,19 @@ function getVideoStatistics(listOfIds) {
             }
         })
         .done(function(data) {
-            doneCallingStatisticsAPI = true;
             if (count2 < listOfIds.length) {
                 videoStatistics.push(data.items[0]);
                 count2++;
                 getVideoStatistics(videoIds);
             } else {
+                doneCallingStatisticsAPI = true;
+
                 var max = 0;
                 var maxLocation;
 
                 for (var i = 0; i < videoStatistics.length; i++) {
                     var current = 0;
-                    if(videoStatistics[i] != undefined) { //fix this eventually
+                    if (videoStatistics[i] != undefined) { //fix this eventually
                         current = parseInt(videoStatistics[i].statistics.likeCount);
                     }
                     if (current > max) {
