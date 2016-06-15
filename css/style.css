@@ -14,5 +14,12 @@
 
 #graph-container {
     position: relative;
-    top: 100px;
+}
+
+#user-control {
+    color: black;
+}
+
+#user-control:hover {
+    color: grey;
 }

@@ -9,8 +9,9 @@
     <title>Watch History Analyzer</title>
     <!-- Bootstrap -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
     <link href="css/style.css" rel="stylesheet">
-    <link href="css/menu-icon.css" rel="stylesheet">
+    <!--<link href="font-awesome/font-awesome.min.css" rel="stylesheet">-->
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -28,37 +29,83 @@
         </div>
     </div>
     <div id="actual-page">
-        <div class="container">
+        <div class="container" style="padding: 0px">
             <nav class="navbar navbar-light">
-                <div class="nav navbar-nav">
-                    <a class="navicon-button x">
-                        <div class="navicon"></div>
-                    </a>
+                <div class="navbar-header">
+                    <h1 class="navbar-brand">Youtube History Analytics<h1>
+                    <a id="user-control" class="pull-right"><i class="fa fa-user" aria-hidden="true"></i></a>
                 </div>
             </nav>
         </div>
         <div class="container text-center" id="graph-container">
-            <div class="row" style="height: 27vh">
+            <div class="row" style="height: 40vh">
                 <div class="col-md-9" style="background-color:green; height: 100%">
-                    <h1>Category Graph</h1>
+                    <h1 style="position: relative; top: 40%">Category Graph</h1>
                 </div>
                 <div class="col-md-3" style="background-color:blue; height: 100%">
                     <div id="total-vids-in-history" style="position: relative; top: 30%"></div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="height: 40vh">
+                <div class="col-md-4" style="background-color:red; height: 100%">
+                    <div style="position: relative; top: 40%">
+                        <h1>Total Minutes Watched</h1>
+                    </div>
+                </div>
+                <div class="col-md-4" style="background-color:orange; height: 100%">
+                    <div style="position: relative; top: 40%">
+                        <div id="most-likes" style="position: relative; top: 30%"></div>
+                    </div>
+                </div>
+                <div class="col-md-4" style="background-color:yellow; height: 100%">
+                    <div style="position: relative; top: 40%">
+                        <h1>Channel watched with most subscribers</h1>
+                    </div>
+                </div>
             </div>
-            <div class="row">
+            <div class="row" style="height: 40vh">
+                <div class="col-md-3" style="background-color:purple; height: 100%">
+                    <div style="position: relative; top: 40%">
+                        <h1>Most videos watched in one day</h1>
+                    </div>
+                </div>
+                <div class="col-md-6" style="background-color:blue; height: 100%">
+                    <div style="position: relative; top: 40%">
+                        <h1>Days since last history clear</h1>
+                    </div>
+                </div>
+                <div class="col-md-3" style="background-color:green; height: 100%">
+                    <div style="position: relative; top: 40%">
+                        <h1>Another Number</h1>
+                    </div>
+                </div>
             </div>
         </div>
+    <div class="container text-center" style="height: 30vh">
+        <div class="row" style="position: relative; top: 40%">
+            <div class="col-sm-6 col-sm-offset-3">
+                <div class="col-sm-6">
+                    <p>GITHUB</p>
+                </div>
+                <div class="col-sm-6">
+                    <p>FACEBOOK</p>
+                </div>
+                <div>
+                    <p>Copyright Peter French</p>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
     <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
-    <script src="js/transformicon.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.0/jquery.waypoints.min.js"></script>
     <script src="js/oauth.js"></script>
+    <script src="js/graphics.js"></script>
 </body>
 
 </html>
