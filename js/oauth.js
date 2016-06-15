@@ -58,21 +58,24 @@ $.ajax({
                     }
                     console.log('Only one page or less of videos');
                     console.log(videoIds.length + ' number of videos in your watch history');
-                    $('#total-vids-in-history').html('<h1 class="counter">' + videoIds.length + '</h1><p>videos analyzed</p>');
                     getVideosSnippets(videoIds);
                     getVideoStatistics(videoIds);
-                    setTimeout(function() {
-                        $('#splashscreen').fadeOut(500);
-                    }, 1000);
-                    setTimeout(function() {
-                        $('#actual-page').fadeIn(500);
-                        $('.counter').counterUp({
-                            time: 1000
-                        });
-                    }, 2000);
                 }
             });
     });
+
+//Clears the splashscreen and loads the dash
+function revealDash() {
+    setTimeout(function() {
+        $('#splashscreen').fadeOut(500);
+    }, 1000);
+    setTimeout(function() {
+        $('#actual-page').fadeIn(500);
+        $('.counter').counterUp({
+            time: 1000
+        });
+    }, 2000);
+}
 
 //Gets the IDs of the videos in the authenticated user's watch history playlist recursively
 function getVideoIdsFromHistory(playlistId, pageToken) {
@@ -95,20 +98,6 @@ function getVideoIdsFromHistory(playlistId, pageToken) {
                 console.log(videoIds.length + ' number of videos in your watch history.');
                 getVideosSnippets(videoIds);
                 getVideoStatistics(videoIds);
-                setTimeout(function() {
-                        $('#splashscreen').fadeOut(500);
-                    }, 1000);
-                    setTimeout(function() {
-                        $('#actual-page').fadeIn(500);
-                        $('.counter').counterUp({
-                            delay: 10,
-                            time: 1000
-                        });
-                    }, 2000);
-                $('.counter').counterUp({
-                    delay: 10,
-                    time: 1000
-                });
             }
         });
 }
@@ -123,12 +112,13 @@ function getVideosSnippets(listOfIds) {
             }
         })
         .done(function(data) {
+            doneCallingSnippetAPI = true;
             if (count1 < listOfIds.length) {
                 videoSnippets.push(data.items[0]);
                 count1++;
                 getVideosSnippets(videoIds);
-            } else {
-                console.log(videoSnippets);
+            } else if (doneCallingStatisticsAPI) {
+                revealDash();
             }
         })
 }
@@ -143,6 +133,7 @@ function getVideoStatistics(listOfIds) {
             }
         })
         .done(function(data) {
+            doneCallingStatisticsAPI = true;
             if (count2 < listOfIds.length) {
                 videoStatistics.push(data.items[0]);
                 count2++;
@@ -151,14 +142,21 @@ function getVideoStatistics(listOfIds) {
                 var max = 0;
                 var maxLocation;
 
-                for (var i = videoStatistics.length - 1; i >= 0; i--) {
-                    var current = parseInt(videoStatistics[i].statistics.likeCount);
+                for (var i = 0; i < videoStatistics.length; i++) {
+                    var current = 0;
+                    if(videoStatistics[i] != undefined) { //fix this eventually
+                        current = parseInt(videoStatistics[i].statistics.likeCount);
+                    }
                     if (current > max) {
                         max = current;
                         maxLocation = i;
                     }
                 };
                 $('#most-likes').html('<h1 class="counter">' + max + '</h1><p>likes on </p>' + videoSnippets[maxLocation].snippet.title);
+                $('#total-vids-in-history').html('<h1 class="counter">' + listOfIds.length + '</h1><p>videos analyzed</p>');
+                if (doneCallingSnippetAPI) {
+                    revealDash();
+                }
             }
         })
 }
