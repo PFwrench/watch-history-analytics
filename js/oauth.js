@@ -16,6 +16,8 @@ var watchHistoryId;
 var videoIds = [];
 var videoSnippets = [];
 var videoStatistics = [];
+var maxSameCategory;
+var categoryArray = [];
 
 $('#get-info').on('click', function() {
     console.log('registered');
@@ -56,7 +58,7 @@ $.ajax({
                     for (var i = 0; i < data.items.length; i++) {
                         videoIds.push(data.items[i].snippet.resourceId.videoId);
                     }
-                    console.log('Only one page or less of videos');
+                    console.log('Less than 50 videos in watch history');
                     console.log(videoIds.length + ' number of videos in your watch history');
                     getVideosSnippets(videoIds);
                     getVideoStatistics(videoIds);
@@ -67,10 +69,11 @@ $.ajax({
 //Clears the splashscreen and loads the dash
 function revealDash() {
     setTimeout(function() {
-        $('#splashscreen').fadeOut(500);
+        $('#splashscreen').fadeOut(750);
     }, 1000);
     setTimeout(function() {
-        $('#actual-page').fadeIn(500);
+        $('#actual-page').fadeIn(750);
+        loadVisuals(categoryArray);
         $('.counter').counterUp({
             time: 1000
         });
@@ -102,6 +105,7 @@ function getVideoIdsFromHistory(playlistId, pageToken) {
         });
 }
 
+
 var count1 = 0;
 
 function getVideosSnippets(listOfIds) {
@@ -117,13 +121,78 @@ function getVideosSnippets(listOfIds) {
                 count1++;
                 getVideosSnippets(videoIds);
             } else {
-                doneCallingStatisticsAPI = true;
+                doneCallingSnippetAPI = true;
+                console.log("DONE WITH SNIPPET, GETTING CATEGORIES");
+                getCategoryInfo();
                 if (doneCallingStatisticsAPI) {
                     revealDash();
                 }
             }
-        })
+        });
 }
+
+
+function getCategoryInfo() {
+
+    //Counts number of videos in each category
+    for (var i = 0; i < videoSnippets.length; i++) {
+
+        if (videoSnippets[i] != undefined) {
+            var currentId = parseInt(videoSnippets[i].snippet.categoryId);
+
+            var alreadyExists = false;
+
+            for (var j = 0; j < categoryArray.length; j++) {
+                if(currentId == categoryArray[j].id) {
+                    categoryArray[j].count++;
+                    alreadyExists = true;
+                    break;
+                }
+            };
+
+            if (!alreadyExists) {
+                var temp = {
+                                "id": currentId,
+                                "name": "",
+                                "count": 1
+                        };
+
+                categoryArray.push(temp);
+            }
+        }
+    }
+        
+
+    //Retrieves the names of the category IDs from the Google API
+    var categoryIds = videoSnippets[0].snippet.categoryId;
+
+    for (var i = 0; i < videoSnippets.length; i++) {
+        if (videoSnippets[i] != undefined) {
+            categoryIds = categoryIds + ',' + videoSnippets[i].snippet.categoryId;
+        }
+    }
+
+    $.ajax({
+            url: 'https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=' + categoryIds + '&mine=true',
+            headers: {
+                Authorization: 'Bearer ' + params['access_token']
+            }
+        })
+        .done(function(data) {
+            //categoryArray = data.items;
+            console.log(data);
+            var googleCategoryInfo = data.items;
+
+            for (var i = 0; i < googleCategoryInfo.length; i++) {
+                for (var j = 0; j < categoryArray.length; j++) {
+                    if (googleCategoryInfo[i].id == categoryArray[j].id) {
+                        categoryArray[j].name = googleCategoryInfo[i].snippet.title;
+                    }
+                };
+            };
+        });
+}
+
 
 var count2 = 0;
 
@@ -142,20 +211,36 @@ function getVideoStatistics(listOfIds) {
             } else {
                 doneCallingStatisticsAPI = true;
 
-                var max = 0;
-                var maxLocation;
+                var maxLikes = 0;
+                var maxLikesLocation;
 
                 for (var i = 0; i < videoStatistics.length; i++) {
                     var current = 0;
                     if (videoStatistics[i] != undefined) { //fix this eventually
                         current = parseInt(videoStatistics[i].statistics.likeCount);
                     }
-                    if (current > max) {
-                        max = current;
-                        maxLocation = i;
+                    if (current > maxLikes) {
+                        maxLikes = current;
+                        maxLikesLocation = i;
                     }
                 };
-                $('#most-likes').html('<h1 class="counter">' + max + '</h1><p>likes on </p>' + videoSnippets[maxLocation].snippet.title);
+
+                var maxViews = 0;
+                var maxViewsLocation;
+
+                for (var i = 0; i < videoStatistics.length; i++) {
+                    var current = 0;
+                    if (videoStatistics[i] != undefined) { //fix this eventually
+                        current = parseInt(videoStatistics[i].statistics.viewCount);
+                    }
+                    if (current > maxViews) {
+                        maxViews = current;
+                        maxViewsLocation = i;
+                    }
+                }
+
+                $('#most-likes').html('<h1 class="counter">' + maxLikes + '</h1><p>likes on </p>' + videoSnippets[maxLikesLocation].snippet.title);
+                $('#most-views').html('<h1 class="counter">' + maxViews + '</h1><p>views on </p>' + videoSnippets[maxViewsLocation].snippet.title);
                 $('#total-vids-in-history').html('<h1 class="counter">' + listOfIds.length + '</h1><p>videos analyzed</p>');
                 if (doneCallingSnippetAPI) {
                     revealDash();
